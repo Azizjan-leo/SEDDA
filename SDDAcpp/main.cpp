@@ -1,4 +1,4 @@
-//draw_main.cpp: main loop of drawing program
+﻿//draw_main.cpp: main loop of drawing program
 
 #define _USE_MATH_DEFINES
 #include <GL/glut.h>
@@ -25,7 +25,7 @@ struct Point {
 } A{ -1, 1 }, B{ 1 }, C{ 1 }, D, E, F;
 
 float xstart, ystart, xend, yend, step, xinc, yinc, x, y, perim;
-int win = 140;
+int win = 500;
 int width = win, height = win;
 
 void Input() 
@@ -43,7 +43,6 @@ void init(void)
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);	//get white background color
     glColor3f(0.0f, 0.0f, 0.0f);	//set drawing color
-    glPointSize(20.0);			 // sets the size of points to be drawn (in pixels)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();			//replace current matrix with identity matrix
     gluOrtho2D(0.0, perim, 0.0, perim);
@@ -84,11 +83,11 @@ void DrawBig(float newXEnd, float newYEnd) // pseudopixels 20x20
         glEnd();
     }
 }
+
 void DrawHexagon() 
 {
-    glClear(GL_COLOR_BUFFER_BIT);	//clear screen
-
-    glColor3f(1.0, 0.5, 0.0);
+    glColor3f(1.0, 0.5, 0.0); // set orange color
+    glPointSize(20.0);			 // sets the size of points to be drawn (in pixels)
     x = A.x;               //assign xstart to x
     y = A.y;              //assign ystart to y
 
@@ -105,13 +104,100 @@ void DrawHexagon()
     //F->A
     DrawBig(A.x, A.y);
 }
+
+void DrawInnerLines()
+{
+    glColor3f(1.0, 0.0, 0.0); // set black color
+    glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
+
+    /*
+        Перевод из 20х20 в 10х10ж
+        с учетом того, в каком квадранте должен находиться новый псевдопиксель
+        мы либо отнимаем (лево/низ) либо прибавляем (верх/право) 1
+    */
+    int startX = C.x * 2 - 1; // x start in 10x10 pseudopixels
+    int startY = C.y * 2; // y start in 10x10 pseudopixels
+    int endX = F.x * 2; // x end in 10x10 pseudopixels
+    int endY = F.y * 2 - 1; // y end in 10x10 pseudopixels
+
+    float xdiff = endX - startX;
+    float yiff = endY - startY;
+    
+    if (abs(xdiff) > abs(yiff))
+        step = abs(xdiff);                //assign abs(xdiff) to step1 if xdiff>yiff
+    else
+        step = abs(yiff);              //assign abs(yiff) to step1 if xdiff<yiff
+
+    xinc = xdiff / step;            //assign xdiff/step1 to xinc
+    yinc = yiff / step;           //assign yiff/step1 to yinc
+    x = startX;
+    y = startY;
+    int rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+
+    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+    glEnd();
+
+    for (int k = 0; k < Round(step); k++)
+    {
+        x = x + xinc;       // update x by xinc
+        y = y + yinc;
+        rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+      
+        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+        glEnd();
+    }
+}
+
+//void DrawInnerLines()
+//{
+//    glColor3f(0.0, 0.0, 0.0); // set black color
+//    glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
+//
+//    x = C.x;
+//    y = C.y;
+//    float yiff = F.y - C.y;
+//    float xdiff = F.x - C.x ;
+//    if (abs(xdiff) > abs(yiff))
+//        step = abs(xdiff);                //assign abs(xdiff) to step1 if xdiff>yiff
+//    else
+//        step = abs(yiff);              //assign abs(yiff) to step1 if xdiff<yiff
+//
+//    xinc = xdiff / step;            //assign xdiff/step1 to xinc
+//    yinc = yiff / step;           //assign yiff/step1 to yinc
+//
+//    int rX = C.x, rY = C.y;
+//
+//    rX = (Round(x) * 10 - 5) * 2, rY = (Round(y) * 10 - 5)*2;
+//
+//    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//    glEnd();
+//
+//    for (int k = 0; k < Round(step); k++)
+//    {
+//        x = x + xinc;       // update x by xinc
+//        y = y + yinc;
+//        rX = (Round(x) * 10 - 5) * 2, rY = (Round(y) * 10 - 5) * 2;
+//      
+//        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//        glEnd();
+//    }
+//}
+
 void display(void)
 {
-    DrawHexagon();
+    glClear(GL_COLOR_BUFFER_BIT);	//clear screen
+
+    DrawHexagon(); // Big 20x20 outer lines. DDA
+
+    DrawInnerLines(); // Little 10x10 innter lines. Bresenham's Line Drawing Algorithm
 
     glutPostRedisplay();
 
-    glFlush();				//send all output to screen
+    glFlush();	//send all output to screen
 }
 
 void SetPoints() {
@@ -153,10 +239,7 @@ void SetPoints() {
     } 
 }
 
-void DrawInnerLines() 
-{
 
-}
 
 int main(int argc, char** argv)
 {
