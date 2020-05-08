@@ -25,7 +25,7 @@ struct Point {
 } A{ -1, 1 }, B{ 1 }, C{ 1 }, D, E, F;
 
 float xstart, ystart, xend, yend, step, xinc, yinc, x, y, perim;
-int win = 500;
+int win = 140;
 int width = win, height = win;
 
 void Input() 
@@ -57,7 +57,8 @@ int Round(float a)			//any x i.e 1>=x>=0.5 is rounded to 1
         return int(a);
 }
 
-void draw(float newXEnd, float newYEnd) {
+void DrawBig(float newXEnd, float newYEnd) // pseudopixels 20x20
+{
     float yiff = newYEnd - y;
     float xdiff = newXEnd - x;
     if (abs(xdiff) > abs(yiff))
@@ -69,69 +70,51 @@ void draw(float newXEnd, float newYEnd) {
     yinc = yiff / step;           //assign yiff/step1 to yinc
 
 
-    int rX = Round(x), rY = Round(y);
-    glColor3f(1.0, 0.5, 0.0);
+    int rX = x, rY = y;
+  
     for (int k = 0; k < Round(step); k++)
     {
         x = x + xinc;       // update x by xinc
         y = y + yinc;
         rX = Round(x) * 20 - 10, rY = Round(y) * 20 - 10;
-        if (k == step - 1)
-            glColor3f(0.0, 0.0, 0.0);
+      /*  if (k == step - 1)
+            glColor3f(0.0, 0.0, 0.0);*/
         glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
         glVertex2i(rX, rY);//sets vertex
         glEnd();
     }
 }
-
-void display(void)
+void DrawHexagon() 
 {
     glClear(GL_COLOR_BUFFER_BIT);	//clear screen
+
     glColor3f(1.0, 0.5, 0.0);
-    float yiff = B.y - A.y;
-    float xdiff = B.x - A.x;
-    if (abs(xdiff) > abs(yiff))
-        step = abs(xdiff);                //assign abs(xdiff) to step1 if xdiff>yiff
-    else
-        step = abs(yiff);              //assign abs(yiff) to step1 if xdiff<yiff
-
-    xinc = xdiff / step;            //assign xdiff/step1 to xinc
-    yinc = yiff / step;           //assign yiff/step1 to yinc
-
     x = A.x;               //assign xstart to x
     y = A.y;              //assign ystart to y
 
-    int rX = Round(x), rY = Round(y);
-
-    for (int k = 0; k < Round(step); k++)
-    {
-        x = x + xinc;       // update x by xinc
-        y = y + yinc;
-        rX = Round(x) * 20 - 10, rY = Round(y) * 20 - 10;
-        if(k==step-1)
-            glColor3f(0.0, 0.0, 0.0);
-        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-            glVertex2i(rX, rY);//sets vertex
-        glEnd();
-    }
-
+    //A->B
+    DrawBig(B.x, B.y);
     //B->C
-    draw(C.x, C.y);
+    DrawBig(C.x, C.y);
     //C->D
-    draw(D.x, D.y);
-    //
-    draw(E.x, E.y);
-    //
-    draw(F.x, F.y);
-    //
-    draw(A.x, A.y);
+    DrawBig(D.x, D.y);
+    //D->E
+    DrawBig(E.x, E.y);
+    //E->F
+    DrawBig(F.x, F.y);
+    //F->A
+    DrawBig(A.x, A.y);
+}
+void display(void)
+{
+    DrawHexagon();
 
     glutPostRedisplay();
 
     glFlush();				//send all output to screen
 }
 
-void setPoints() {
+void SetPoints() {
     int p = perim / 20; //perimeter in pseudopixels
 
     double sinus = 0.5;// sin(30 * M_PI / 180.0); // 
@@ -141,18 +124,14 @@ void setPoints() {
     int y = r * sinus;
     int x = r * cosinus;
 
-
-
     //A
     A.x = Round(r);
     A.y = 1;
 
     //B
-    B.x = Round(((x) * -1) + (r + 1));
     B.y = Round(y * -1 + (r));
 
     //C
-    C.x = Round(x*-1 + (r + 1));
     C.y = Round(y + (r));
 
     //D
@@ -168,25 +147,29 @@ void setPoints() {
     F.y = Round(y * -1 + (r));
 
     C.x = B.x = A.x;
-
     for (int i = E.x; i > A.x; i--) 
     {
         C.x = --B.x;
     } 
 }
 
+void DrawInnerLines() 
+{
+
+}
+
 int main(int argc, char** argv)
 {
   //  Input();
     
-    perim = (width > height) ? height : width; // Find the small side to define the perimeter in pseudopixels
+    perim = (width > height) ? height : width; // Find the smallest side to define the perimeter in pseudopixels
     
     while((int)perim % 40 != 20)
     {
         perim--;
     }
     
-    setPoints();
+    SetPoints();
     glutInit(&argc, argv);	//initialize toolkit
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);	//set display mode: single bufferring, RGBA model
     glutInitWindowSize(width,height);		//set window size on screen
