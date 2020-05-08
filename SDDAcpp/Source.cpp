@@ -4,7 +4,42 @@
 //#include<math.h>
 //#include <cstdlib>
 //#include <iostream>
-
+//void DrawInnerLines()
+//{
+//    glColor3f(0.0, 0.0, 0.0); // set black color
+//    glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
+//
+//    x = C.x;
+//    y = C.y;
+//    float yiff = F.y - C.y;
+//    float xdiff = F.x - C.x ;
+//    if (abs(xdiff) > abs(yiff))
+//        step = abs(xdiff);                //assign abs(xdiff) to step1 if xdiff>yiff
+//    else
+//        step = abs(yiff);              //assign abs(yiff) to step1 if xdiff<yiff
+//
+//    xinc = xdiff / step;            //assign xdiff/step1 to xinc
+//    yinc = yiff / step;           //assign yiff/step1 to yinc
+//
+//    int rX = C.x, rY = C.y;
+//
+//    rX = (Round(x) * 10 - 5) * 2, rY = (Round(y) * 10 - 5)*2;
+//
+//    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//    glEnd();
+//
+//    for (int k = 0; k < Round(step); k++)
+//    {
+//        x = x + xinc;       // update x by xinc
+//        y = y + yinc;
+//        rX = (Round(x) * 10 - 5) * 2, rY = (Round(y) * 10 - 5) * 2;
+//      
+//        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//        glEnd();
+//    }
+//}
 //void myinit(void)
 //{
 //    glClearColor(1.0, 1.0, 1.0, 0.0);
