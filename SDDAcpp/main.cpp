@@ -1,14 +1,9 @@
 ﻿//draw_main.cpp: main loop of drawing program
 
-#define _USE_MATH_DEFINES
-#include <GL/glut.h>
+#define _USE_MATH_DEFINES // for PI number
 #include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
-#include <GL/glut.h>
-#include <cstdlib>
-
+#include <iostream> 
+#include <GL/glut.h> //Drawing
 
 //initialization
 void init(void);
@@ -25,7 +20,7 @@ struct Point {
 } A{ -1, 1 }, B{ 1 }, C{ 1 }, D, E, F;
 
 float xstart, ystart, xend, yend, step, xinc, yinc, x, y, perim;
-int win = 140;
+int win = 500;
 int width = win, height = win;
 
 void Input() 
@@ -190,68 +185,6 @@ void DrawInnerLines()
     endY = D.y * 2; // y end in 10x10 pseudopixels
     Brezenhem(startX, startY, endX, endY, true); // true means it is the vertical line
 }
-
-//void DrawInnerLines()
-//{
-//    glColor3f(1.0, 0.0, 0.0); // set black color
-//    glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
-//
-//    /*
-//        Перевод из 20х20 в 10х10ж
-//        с учетом того, в каком квадранте должен находиться новый псевдопиксель
-//        мы либо отнимаем (лево/низ) либо прибавляем (верх/право) 1
-//    */
-//
-//    int startX = C.x * 2 - 1; // x start in 10x10 pseudopixels
-//    int startY = C.y * 2; // y start in 10x10 pseudopixels
-//    int endX = F.x * 2; // x end in 10x10 pseudopixels
-//    int endY = F.y * 2 - 1; // y end in 10x10 pseudopixels
-//
-//    float xdiff = endX - startX;
-//    float ydiff = endY - startY;
-//    
-//    int p = 2 * ydiff - xdiff;
-//
-//  
-//
-//    x = startX;
-//    y = startY;
-//    int rX, rY;
-//    int x2 = endX, x1 = startX, y2 = endY, y1 = endY;
-//
-//    const int deltaX = abs(x2 - x1);
-//    const int deltaY = abs(y2 - y1);
-//    const int signX = x1 < x2 ? 1 : -1;
-//    const int signY = y1 < y2 ? 1 : -1;
-//    //
-//    int error = deltaX - deltaY;
-//    //
-//    rX = (Round(x2) * 10 - 5), rY = (Round(y2) * 10 - 5);
-//    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-//        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
-//    glEnd();
-//    while (x1 != x2 || y1 != y2)
-//    {
-//        rX = (Round(x1) * 10 - 5), rY = (Round(y1) * 10 - 5);
-//        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-//            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
-//        glEnd();
-//        const int error2 = error * 2;
-//        //
-//        if (error2 > -deltaY)
-//        {
-//            error -= deltaY;
-//            x1 += signX;
-//        }
-//        if (error2 < deltaX)
-//        {
-//            error += deltaX;
-//            y1 += signY;
-//        }
-//    }
-//           
-//
-//}
 
 void display(void)
 {
