@@ -14,22 +14,23 @@ void display(void);
  *  Open window with initial window size, title bar,
  *  RGBA display mode, depth buffer.
  */
+
 struct Point {
     int x = -1;
     int y = -1;
 } A{ -1, 1 }, B{ 1 }, C{ 1 }, D, E, F;
 
-float xstart, ystart, xend, yend, step, xinc, yinc, x, y, perim;
-int win = 500;
-int width = win, height = win;
+float step, xinc, yinc, x, y, perim;
 
 void Input() 
-{
-    std::cout << "Enter width (>139): ";
-    std::cin >> width;
-    std::cout << "Enter height (>139): ";
-    std::cin >> height;
-    if (width < 140 || height < 140) {
+{ 
+    /*
+    140 pixels is the min height for the hexagon drawed by 20x20 pseudopixels
+    */
+    std::cout << "Enter side length (>139): ";
+    std::cin >> perim;
+
+    if (perim < 140) {
         std::cout << "Too small parameters!\n";
         Input();
     }
@@ -38,9 +39,9 @@ void init(void)
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);	//get white background color
     glColor3f(0.0f, 0.0f, 0.0f);	//set drawing color
-    glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION); //(0,0) is in the left buttom corner
     glLoadIdentity();			//replace current matrix with identity matrix
-    gluOrtho2D(0.0, perim, 0.0, perim);
+    gluOrtho2D(0.0, perim, 0.0, perim); // set workplace with the entered perimeter
 }
 
 int Round(float a)			//any x i.e 1>=x>=0.5 is rounded to 1
@@ -70,11 +71,10 @@ void DrawBig(float newXEnd, float newYEnd) // pseudopixels 20x20
     {
         x = x + xinc;       // update x by xinc
         y = y + yinc;
+        // to convert coordinates ц
         rX = Round(x) * 20 - 10, rY = Round(y) * 20 - 10;
-      /*  if (k == step - 1)
-            glColor3f(0.0, 0.0, 0.0);*/
         glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-        glVertex2i(rX, rY);//sets vertex
+            glVertex2i(rX, rY);//sets vertex
         glEnd();
     }
 }
@@ -242,9 +242,7 @@ void SetPoints() {
 
 int main(int argc, char** argv)
 {
-  //  Input();
-    
-    perim = (width > height) ? height : width; // Find the smallest side to define the perimeter in pseudopixels
+    Input();
     
     // 
     while((int)perim % 40 != 20)
@@ -255,7 +253,7 @@ int main(int argc, char** argv)
     SetPoints();
     glutInit(&argc, argv);	//initialize toolkit
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);	//set display mode: single bufferring, RGBA model
-    glutInitWindowSize(width,height);		//set window size on screen
+    glutInitWindowSize(perim,perim);		//set window size on screen
     glutInitWindowPosition(100, 100); 	//set window position on screen
     glutCreateWindow(argv[0]);		//open screen window
     init();
