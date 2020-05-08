@@ -105,8 +105,9 @@ void DrawHexagon()
     DrawBig(A.x, A.y);
 }
 
-void Brezenhem(int x0, int y0, int x1, int y1) {
+void Brezenhem(int x0, int y0, int x1, int y1, bool isCenter) {
     int A, B, sign;
+    int xShift = isCenter ? 10 : 5;
     A = y1 - y0;
     B = x0 - x1;
     if (abs(A) > abs(B)) sign = 1;
@@ -117,7 +118,7 @@ void Brezenhem(int x0, int y0, int x1, int y1) {
     if (B < 0) signb = -1;
     else signb = 1;
     int f = 0;
-    int rX = (Round(x0) * 10 - 5), rY = (Round(y0) * 10 - 5);
+    int rX = (Round(x0) * 10 - xShift), rY = (Round(y0) * 10 - 5);
     glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
     glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
     glEnd();
@@ -132,7 +133,7 @@ void Brezenhem(int x0, int y0, int x1, int y1) {
                 y += signa;
             }
             x -= signb;
-            rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+            rX = (Round(x) * 10 - xShift), rY = (Round(y) * 10 - 5);
             glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
             glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
             glEnd();
@@ -147,13 +148,14 @@ void Brezenhem(int x0, int y0, int x1, int y1) {
                 x -= signb;
             }
             y += signa;
-            rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+            rX = (Round(x) * 10 - xShift), rY = (Round(y) * 10 - 5);
             glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
             glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
             glEnd();
         } while (x != x1 || y != y1);
     }
 }
+
 void DrawInnerLines()
 {
     glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
@@ -170,7 +172,7 @@ void DrawInnerLines()
     int startY = C.y * 2; // y start in 10x10 pseudopixels
     int endX = F.x * 2; // x end in 10x10 pseudopixels
     int endY = F.y * 2 - 1; // y end in 10x10 pseudopixels
-    Brezenhem(startX, startY, endX, endY);
+    Brezenhem(startX, startY, endX, endY, false); // false means it is not the vertical line
 
     //B -> E GREEN
     glColor3f(0.0, 1.0, 0.0); // set green color in rgb
@@ -178,7 +180,15 @@ void DrawInnerLines()
     startY = B.y * 2 - 1; // y start in 10x10 pseudopixels
     endX = E.x * 2; // x end in 10x10 pseudopixels
     endY = E.y * 2; // y end in 10x10 pseudopixels
-    Brezenhem(startX, startY, endX, endY);
+    Brezenhem(startX, startY, endX, endY, false); // false means it is not the vertical line
+
+    //A -> D BLUE
+    glColor3f(0.0, 0.0, 1.0); // set blue color in rgb
+    startX = A.x * 2; // x start in 10x10 pseudopixels
+    startY = A.y * 2 - 1; // y start in 10x10 pseudopixels
+    endX = D.x * 2; // x end in 10x10 pseudopixels
+    endY = D.y * 2; // y end in 10x10 pseudopixels
+    Brezenhem(startX, startY, endX, endY, true); // true means it is the vertical line
 }
 
 //void DrawInnerLines()
