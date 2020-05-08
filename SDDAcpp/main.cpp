@@ -25,7 +25,7 @@ struct Point {
 } A{ -1, 1 }, B{ 1 }, C{ 1 }, D, E, F;
 
 float xstart, ystart, xend, yend, step, xinc, yinc, x, y, perim;
-int win = 500;
+int win = 140;
 int width = win, height = win;
 
 void Input() 
@@ -105,9 +105,57 @@ void DrawHexagon()
     DrawBig(A.x, A.y);
 }
 
+void Brezenhem(int x0, int y0, int x1, int y1) {
+    int A, B, sign;
+    A = y1 - y0;
+    B = x0 - x1;
+    if (abs(A) > abs(B)) sign = 1;
+    else sign = -1;
+    int signa, signb;
+    if (A < 0) signa = -1;
+    else signa = 1;
+    if (B < 0) signb = -1;
+    else signb = 1;
+    int f = 0;
+    int rX = (Round(x0) * 10 - 5), rY = (Round(y0) * 10 - 5);
+    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+    glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+    glEnd();
+    int x = x0, y = y0;
+    if (sign == -1)
+    {
+        do {
+            f += A * signa;
+            if (f > 0)
+            {
+                f -= B * signb;
+                y += signa;
+            }
+            x -= signb;
+            rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+            glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+            glEnd();
+        } while (x != x1 || y != y1);
+    }
+    else
+    {
+        do {
+            f += B * signb;
+            if (f > 0) {
+                f -= A * signa;
+                x -= signb;
+            }
+            y += signa;
+            rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
+            glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+            glEnd();
+        } while (x != x1 || y != y1);
+    }
+}
 void DrawInnerLines()
 {
-    glColor3f(1.0, 0.0, 0.0); // set black color
     glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
 
     /*
@@ -115,40 +163,85 @@ void DrawInnerLines()
         с учетом того, в каком квадранте должен находиться новый псевдопиксель
         мы либо отнимаем (лево/низ) либо прибавляем (верх/право) 1
     */
+
+    //C -> F RED
+    glColor3f(1.0, 0.0, 0.0); // set red color in rgb
     int startX = C.x * 2 - 1; // x start in 10x10 pseudopixels
     int startY = C.y * 2; // y start in 10x10 pseudopixels
     int endX = F.x * 2; // x end in 10x10 pseudopixels
     int endY = F.y * 2 - 1; // y end in 10x10 pseudopixels
+    Brezenhem(startX, startY, endX, endY);
 
-    float xdiff = endX - startX;
-    float yiff = endY - startY;
-    
-    if (abs(xdiff) > abs(yiff))
-        step = abs(xdiff);                //assign abs(xdiff) to step1 if xdiff>yiff
-    else
-        step = abs(yiff);              //assign abs(yiff) to step1 if xdiff<yiff
-
-    xinc = xdiff / step;            //assign xdiff/step1 to xinc
-    yinc = yiff / step;           //assign yiff/step1 to yinc
-    x = startX;
-    y = startY;
-    int rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
-
-    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
-    glEnd();
-
-    for (int k = 0; k < Round(step); k++)
-    {
-        x = x + xinc;       // update x by xinc
-        y = y + yinc;
-        rX = (Round(x) * 10 - 5), rY = (Round(y) * 10 - 5);
-      
-        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
-            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
-        glEnd();
-    }
+    //B -> E GREEN
+    glColor3f(0.0, 1.0, 0.0); // set green color in rgb
+    startX = B.x * 2 - 1; // x start in 10x10 pseudopixels
+    startY = B.y * 2 - 1; // y start in 10x10 pseudopixels
+    endX = E.x * 2; // x end in 10x10 pseudopixels
+    endY = E.y * 2; // y end in 10x10 pseudopixels
+    Brezenhem(startX, startY, endX, endY);
 }
+
+//void DrawInnerLines()
+//{
+//    glColor3f(1.0, 0.0, 0.0); // set black color
+//    glPointSize(10.0);			 // sets the size of points to be drawn (in pixels)
+//
+//    /*
+//        Перевод из 20х20 в 10х10ж
+//        с учетом того, в каком квадранте должен находиться новый псевдопиксель
+//        мы либо отнимаем (лево/низ) либо прибавляем (верх/право) 1
+//    */
+//
+//    int startX = C.x * 2 - 1; // x start in 10x10 pseudopixels
+//    int startY = C.y * 2; // y start in 10x10 pseudopixels
+//    int endX = F.x * 2; // x end in 10x10 pseudopixels
+//    int endY = F.y * 2 - 1; // y end in 10x10 pseudopixels
+//
+//    float xdiff = endX - startX;
+//    float ydiff = endY - startY;
+//    
+//    int p = 2 * ydiff - xdiff;
+//
+//  
+//
+//    x = startX;
+//    y = startY;
+//    int rX, rY;
+//    int x2 = endX, x1 = startX, y2 = endY, y1 = endY;
+//
+//    const int deltaX = abs(x2 - x1);
+//    const int deltaY = abs(y2 - y1);
+//    const int signX = x1 < x2 ? 1 : -1;
+//    const int signY = y1 < y2 ? 1 : -1;
+//    //
+//    int error = deltaX - deltaY;
+//    //
+//    rX = (Round(x2) * 10 - 5), rY = (Round(y2) * 10 - 5);
+//    glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//        glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//    glEnd();
+//    while (x1 != x2 || y1 != y2)
+//    {
+//        rX = (Round(x1) * 10 - 5), rY = (Round(y1) * 10 - 5);
+//        glBegin(GL_POINTS); // writes pixels on the frame buffer with the current drawing color
+//            glVertex2i(rX, rY); // sets vertex (draws the pseudopixel)
+//        glEnd();
+//        const int error2 = error * 2;
+//        //
+//        if (error2 > -deltaY)
+//        {
+//            error -= deltaY;
+//            x1 += signX;
+//        }
+//        if (error2 < deltaX)
+//        {
+//            error += deltaX;
+//            y1 += signY;
+//        }
+//    }
+//           
+//
+//}
 
 //void DrawInnerLines()
 //{
@@ -251,7 +344,7 @@ int main(int argc, char** argv)
     {
         perim--;
     }
-    
+ 
     SetPoints();
     glutInit(&argc, argv);	//initialize toolkit
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);	//set display mode: single bufferring, RGBA model
